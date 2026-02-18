@@ -1,4 +1,6 @@
 💌 Saraha App
+
+
 📌 Overview
 
 Saraha App is a secure anonymous messaging platform that allows users to send hidden messages to others.
@@ -218,6 +220,11 @@ modules/
 OTP hashed before saving
 
 One-time use enforced
+postman Doc :-
+https://documenter.getpostman.com/view/46710820/2sBXcDHMyH
+
+ح
+حخسفةشى 
 
 Expiration time to prevent reuse 
 
