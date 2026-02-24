@@ -40,4 +40,3 @@ app.listen(port , ()=>{
     
 })
 }
-export default bootstrap

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import {resolve} from 'node:path'
 import {config} from 'dotenv'
