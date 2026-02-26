@@ -21,6 +21,7 @@ export const sendOtpFunction = async ({ email }) => {
     await OTPModel.create({
         email,
         code: hashOTP,
+        expiresAt
     });
 
     await sendOTP(email, code);

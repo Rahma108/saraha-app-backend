@@ -1,6 +1,6 @@
 
-import { sendOTP } from '../../common/utils/mailer/mailer.js';
-import { compareHash, generateHash } from '../../common/utils/security/index.js';
+import { generateHash } from '../../common/utils/security/hash.security.js';
+import { transporter } from '../../common/utils/security/otp.security.js';
 import { OTPModel } from '../../DB/index.js';
 
 export function generateOtp() {
@@ -18,13 +18,13 @@ export const sendOtpFunction = async ({ email }) => {
 
     const hashOTP = await generateHash(code)
 
-    await OTPModel.create({
-        email,
-        code: hashOTP,
-    });
-
-    await sendOTP(email, code);
-
+    await OTPModel.create({ email, code : hashOTP });
+        await transporter.sendMail({
+        from: `"My App" <${process.env.MAIL_USER}>`, 
+        to: email,
+        subject: "Your OTP Code",
+        text: `Your OTP code is: ${code}`,
+        });
     return { message: "OTP sent successfully" };
 };
 
@@ -39,7 +39,7 @@ export const verifyOtp = async ({ email, code }) => {
     if (!otpRecord) {
         return { success: false, message: "Invalid or expired OTP" };
     }
-    const isMatch = await compareHash(code, otpRecord.code);
+     const isMatch = await compareHash(code, otpRecord.code);
 
     if (!isMatch) {
         return { success: false, message: "Invalid OTP" };

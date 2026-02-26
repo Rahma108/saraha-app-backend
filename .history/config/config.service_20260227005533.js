@@ -30,6 +30,6 @@ export const ACCESS_EXPIRES_IN= parseInt(process.env.ACCESS_EXPIRES_IN)
 export const REFRESH_EXPIRES_IN= parseInt(process.env.REFRESH_EXPIRES_IN)
 
 // OTP
-export const GMAIL=process.env.GMAIL
+export const GMAIL=process.env.
 export const PASSWORD=process.env.PASSWORD
 

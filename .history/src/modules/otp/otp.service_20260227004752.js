@@ -1,6 +1,6 @@
 
-import { sendOTP } from '../../common/utils/mailer/mailer.js';
 import { compareHash, generateHash } from '../../common/utils/security/index.js';
+import { transporter } from '../../common/utils/security/otp.security.js';
 import { OTPModel } from '../../DB/index.js';
 
 export function generateOtp() {
@@ -21,8 +21,10 @@ export const sendOtpFunction = async ({ email }) => {
     await OTPModel.create({
         email,
         code: hashOTP,
+        expiresAt
     });
 
+    // 👇 استخدمي utility مش transporter مباشرة
     await sendOTP(email, code);
 
     return { message: "OTP sent successfully" };

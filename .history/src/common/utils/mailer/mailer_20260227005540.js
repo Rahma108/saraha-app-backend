@@ -1,6 +1,6 @@
 
 import nodemailer from 'nodemailer'
-import { GMAIL  , PASSWORD} from '../../../../config/config.service.js'
+import { EMAIL  , PASSWORD} from '../../../../config/config.service.js'
 
 export const transporter = nodemailer.createTransport(
     {
@@ -16,7 +16,7 @@ export const transporter = nodemailer.createTransport(
 export const sendOTP = async (email , otp)=>{
     try {
         const info = await transporter.sendMail({
-            from :GMAIL, 
+            from :EMAIL, 
             to : email ,
             subject : "YOUR OTP CODE",
             text :`Your OTP code is ${otp}`
