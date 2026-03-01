@@ -1,0 +1,54 @@
+## Assignment Search :-
+Multer :-
+
+✔️ What is Multer?
+
+Multer is a Node.js middleware for handling multipart/form-data, 
+which is mainly used for uploading files (like images, PDFs, etc.) from a client (browser) to your server.
+
+Express cannot handle file uploads by default, because form-data with files is binary,
+ not JSON. Multer parses this form-data and saves the files where you want.
+
+✔️ How Multer Works (Step-by-Step)
+
+1- Client sends a file
+
+Usually via an HTML form or AJAX FormData.
+
+The enctype of the form must be "multipart/form-data".
+
+2- Multer intercepts the request
+
+It detects fields containing files.
+
+Processes the binary file data.
+
+3- Multer saves the file
+
+Disk storage → saves the file on your server.
+
+Memory storage → keeps the file in memory as a buffer.
+
+4- Multer adds metadata
+
+Single file → req.file
+
+Multiple files → req.files
+
+Metadata includes:
+
+filename
+
+path
+
+size
+
+mimetype
+
+5- Server uses the file
+
+Save path in database.
+
+Resize images.
+
+Respond to the client confirming upload.

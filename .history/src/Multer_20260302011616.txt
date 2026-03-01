@@ -1,0 +1,10 @@
+## Assignment Search :-
+Multer :-
+Multer هي مكتبة Middleware لـ Express.js.
+وظيفتها: اmultipart/form-data، يعني الملفات اللي بتتبعت مع الفورم (صور، ملفات PDF، …).
+
+بتقدر تحميلي ملفات على:
+
+الذاكرة (Memory) → Buffer
+
+القرص الصلب (Disk) → Folder محدد
