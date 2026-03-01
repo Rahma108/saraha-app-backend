@@ -65,7 +65,7 @@ const verifyGoogleAccount = async(idToken)=>{
 }
 
 export const loginWithGmail = async({idToken , issuer})=>{
-  const payload = await verifyGoogleAccount(idToken)
+  const payload = await verifyGoogleAccount()
   const user = await findOne({model:UserModel , email:payload.email  , provider:ProviderEnum.Google })
   if(!user){
     throw NotFoundException({message : "Invalid Login Credentials ."})
@@ -77,7 +77,19 @@ export const loginWithGmail = async({idToken , issuer})=>{
 
 
 export const signupWithGmail = async({idToken , issuer})=>{
-const payload = await verifyGoogleAccount(idToken)
+
+const client = new OAuth2Client();
+
+  const ticket = await client.verifyIdToken({
+      idToken,
+      audience: ClientID , 
+  });
+  const payload = ticket.getPayload();
+  console.log(payload);
+  if(!payload?.email_verified){
+    throw BadRequestException({message:"Fail to verify authenticated this account with google"})
+
+  }
   const checkUserExist = await findOne({model:UserModel , email:payload.email })
   if(checkUserExist){
     if(checkUserExist.provider == ProviderEnum.System){
