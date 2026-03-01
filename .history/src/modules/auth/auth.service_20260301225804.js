@@ -8,7 +8,6 @@ import { compareHash, generateHash  , encrypt , decrypt, createLoginCredentials}
 import { create, findOne } from "../../DB/database.repository.js"
 import { UserModel } from "../../DB/index.js"
 import {OAuth2Client}from 'google-auth-library'
-import { sendOtpFunction } from "../otp/otp.service.js"
 export const signup =async (inputs)=>{
   const {userName , email ,  password , gender , phone , role  } = inputs 
   const checkEmailExists = await findOne({
@@ -28,8 +27,8 @@ export const signup =async (inputs)=>{
     , data : [{userName , email , password: await generateHash(password) , gender , phone : encrypt(phone) 
         , Provider: ProviderEnum.System  , role:role }] })
 
-        // Send a verification code to email after registration
-        await sendOtpFunction({ email: user.email });
+        //
+        await sendOtpFunction({ email: user.email });await sendOtpFunction({ email: user.email });
   return user
 }
 export const login = async(inputs , issuer )=>{

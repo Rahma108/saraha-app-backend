@@ -34,7 +34,7 @@ export const verifyOtp = async ({ email, code }) => {
         throw new Error("Email and code are required");
     }
 
-    const otpRecord = await OTPModel.findOne({ email }).sort({ createdAt: -1 }); // Newest..
+    const otpRecord = await OTPModel.findOne({ email }).sort({ createdAt: -1 }); // Newsest
 
     if (!otpRecord) {
         return { success: false, message: "Invalid or expired OTP" };

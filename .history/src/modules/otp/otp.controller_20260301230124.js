@@ -4,7 +4,7 @@ import { ErrorException, successResponse } from '../../common/utils/response/ind
 import {  sendOtpFunction, verifyOtp } from './otp.service.js'
 const router = Router() // app
 
-// ال user هو ال بيطلب ف حالة ال forget Password ..
+// ال user 
 router.post('/resend-otp', async (req, res, next) => {
     try {
         const result = await sendOtpFunction(req.body); 
