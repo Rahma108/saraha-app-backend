@@ -10,7 +10,7 @@ router.post('/signup' ,validation(validators.signupSchema) , async(req , res , n
 
 })
 
-router.post('/login' , validation(validators.), async(req , res , next )=>{
+router.post('/login' , validation(validators.loginSchema), async(req , res , next )=>{
     const result = await login(req.body , `${req.protocol}://${req.host}`)
     return successResponse({res ,  result})
 })
