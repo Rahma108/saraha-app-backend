@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 
-const tokenSchema = new mongoose.Schema({
+ const tokenSchema = new mongoose.Schema({
     userId : {type : mongoose.Types.ObjectId , ref:"User" , required:true },
     jwtid:{type:String  ,  required:true },
     expiresIn : {type:Date , required:true }

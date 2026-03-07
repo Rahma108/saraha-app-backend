@@ -66,7 +66,7 @@ export const logout = async({flag}, user , decoded  )=>{
             user.changeCredentialTime= new Date(Date.now()) 
             await user.save()
 
-            await deleteMany({model:TokenModel , userId : user._id})
+            await deleteMany({model:TokenModel , filter: { userId: user._id }})
             break;
     
         default:

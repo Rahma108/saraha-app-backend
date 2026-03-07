@@ -5,7 +5,7 @@ import { authRouter , userRouter , otpRouter } from './modules/index.js'
 // file config ............................................
 import { NODE_ENV, port } from '../config/config.service.js'
 import { GlobalError } from './common/utils/response/error.response.js';
-import { connectDB } from './DB/connection.db.js';
+import { connectDB , connectRedis, redisClient } from './DB/index.js';
 import cors from 'cors'
 import {resolve} from 'node:path'
 
@@ -19,7 +19,8 @@ app.use(cors() , express.json())
 app.use('/upload', express.static(resolve('../upload') ))
 // DB ....
 await connectDB()
-
+// #Redis
+await connectRedis()
 //application routing ......................
 app.get('/' , (req , res , next )=>{
     res.send('Hello')
