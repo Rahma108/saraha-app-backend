@@ -6,8 +6,8 @@ import { ACCESS_EXPIRES_IN, REFRESH_EXPIRES_IN, System_REFRESH_TOKEN_SECURITY_KE
 import { AudienceEnum, TokenTypeEnum } from '../../enums/security.enum.js'
 import { BadRequestException, UnauthorizedException } from '../response/error.response.js'
 import { findOne } from '../../../DB/database.repository.js'
-import { UserModel } from '../../../DB/index.js'
-
+import { TokenModel, UserModel } from '../../../DB/index.js'
+import {randomUUID} from 'node:crypto'
 
 // jwt.sign({payload , signature , options })
 export const generateToken = async ({payload = {} , secretKey = User_TOKEN_SECURITY_KEY , options = {}  })=>{
@@ -56,14 +56,15 @@ export const createLoginCredentials = async(user , issuer )=>{
     throw new Error(`Issuer must be string, got: ${typeof issuer}`);
 }
     const {accessSignature , refreshSignature , audience } = await getTokenSignature(user.role)
-
+    const jwtId = randomUUID()
     const access_token =  await generateToken({
         payload : {subject:user._id.toString() } , 
         secretKey:accessSignature , 
         options : {
             issuer : issuer , 
             audience : [TokenTypeEnum.access, audience  ] ,
-            expiresIn : ACCESS_EXPIRES_IN
+            expiresIn : ACCESS_EXPIRES_IN,
+            jwtid:jwtId
         }
 
     })
@@ -73,7 +74,8 @@ export const createLoginCredentials = async(user , issuer )=>{
             options :{
             issuer , 
             audience : [TokenTypeEnum.refresh , audience] ,
-            expiresIn:REFRESH_EXPIRES_IN
+            expiresIn:REFRESH_EXPIRES_IN,
+            jwtid:jwtId
             }
 
         })
@@ -89,6 +91,12 @@ export const decodeToken = async ({token , tokenType = TokenTypeEnum.access  } =
         throw BadRequestException({message : "Fail to decode this token aud is required  "})
         
     }
+    if(await findOne({model:TokenModel ,filter : {jwtid : decoded.jti } })){
+        throw UnauthorizedException({message :"Invalid Login Session ❌"})
+    }
+
+
+
     const [decodeTokenType , audienceType ] = decoded.aud
     if(decodeTokenType !== tokenType ){
         throw BadRequestException({message : `Invalid Token Type ${decodeTokenType}  cannot access api while expected token of ${tokenType}`})
@@ -105,7 +113,10 @@ export const decodeToken = async ({token , tokenType = TokenTypeEnum.access  } =
     if(!user){
         throw UnauthorizedException({message : "Not Register Account ! " })
     }
-    return user
+    if(user.changeCredentialTime && user.changeCredentialTime?.getTime() > decoded.iat * 1000 ){
+        throw UnauthorizedException({message :"Invalid Login Session ❌"})
+    }
+    return {user , decoded}
 
 
 

@@ -65,7 +65,8 @@ const userSchema =  new mongoose.Schema({
         coverProfilePicture : {
             type:[String]
         },
-        visitCount: { type: Number, default: 0 }
+        visitCount: { type: Number, default: 0 },
+        changeCredentialTime:{type:Date }  // Logout
 },{
     collection:"users" ,
     timestamps:true ,

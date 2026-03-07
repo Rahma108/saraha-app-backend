@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { coverPicture, profile, profilePicture, rotateToken, sharedProfile } from './user.service.js'
+import { coverPicture, logout, profile, profilePicture, rotateToken, sharedProfile } from './user.service.js'
 import { authentication, successResponse, validation } from '../../common/utils/index.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 import { authorization } from '../../common/utils/middleware/authorization.middleware.js'
@@ -45,5 +45,10 @@ router.get('/rotate' , authentication(TokenTypeEnum.refresh) , async (req , res 
     
     const result = await rotateToken(req.user , `${req.protocol}://${req.host}`)
     return successResponse({res , result})
+})
+
+router.post('/logout', authentication() ,  async(req , res , next)=>{
+    const status = await logout(req.body, req.user, req.decoded )
+    return successResponse({res  , status:status  })
 })
 export default router

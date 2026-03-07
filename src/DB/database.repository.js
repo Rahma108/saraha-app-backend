@@ -16,9 +16,10 @@ export const createOne = async( {
     options = {validateBeforeSave : true } 
 
 } = {})=>{
-    const [doc] = await model.create(data , options) || []
+    const [doc] = await model.create(data=[data] , options) || []
     return doc
 }
+
 
 
 export const findById = async ({
