@@ -12,9 +12,22 @@ export const generalValidationFields ={
     id:joi.string().custom( (value , helper)=>{
                 return Types.ObjectId.isValid(value)? true:helper.message("Invalid ObjectId .")
     
-            })
-    
+            }),
+    file:function(mimetype=[]){
+        return joi.object().keys(
+                {
+                fieldname: joi.string(),
+                originalname: joi.string(),
+                encoding: joi.string(),
+                mimetype:  joi.string().valid(...mimetype),
+                finalPath:joi.string().required(),
+                destination: joi.string(),
+                filename:joi.string(),   
+                path: joi.string(),
+                size: joi.number().positive()
+                }
+        )
 
-
+    }
 
 }

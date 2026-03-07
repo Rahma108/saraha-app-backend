@@ -1,6 +1,5 @@
-// logic
-import { Types } from "mongoose";
-import { decrypt } from "../../common/utils/index.js";
+import fs from 'fs'
+import { resolve } from 'node:path';
 import { createLoginCredentials} from "../../common/utils/security/token.security.js";
 import { findOne, updateOne, UserModel } from "../../DB/index.js";
 
@@ -35,12 +34,27 @@ export const sharedProfile= async  (userId)=>{
 
 export const profilePicture = async(file , user )=>{
 
+    // user.profilePicture = file.finalPath
+    // await user.save()
+    // return user
+
+    if(user.profilePicture){
+        const oldPath = resolve(user.profilePicture);
+        if(fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    }
     user.profilePicture = file.finalPath
-    await user.save()
-    return user
+    await user.save();
+    return user;
 }
 
 
+export const coverPicture = async(files , user )=>{
+    if(files.coverProfilePicture){
+        user.coverProfilePicture = files.coverProfilePicture.map(file => file.finalPath)
+    }
+    await user.save()
+    return user
+}
 // refresh ........................................
 
 

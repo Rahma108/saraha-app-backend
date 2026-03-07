@@ -1,11 +1,11 @@
 import {Router} from 'express'
-import { profile, profilePicture, rotateToken, sharedProfile } from './user.service.js'
+import { coverPicture, profile, profilePicture, rotateToken, sharedProfile } from './user.service.js'
 import { authentication, successResponse, validation } from '../../common/utils/index.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 import { authorization } from '../../common/utils/middleware/authorization.middleware.js'
 import { endPoint } from './user.authorization.js'
 import * as validators from './user.validation.js'
-import { upload } from '../../common/utils/multer.js'
+import { fieldValidation, upload } from '../../common/utils/multer.js'
 const router = Router() 
 
 router.get('/' , authentication() , authorization(endPoint.profile), async (req , res , next )=>{
@@ -21,9 +21,23 @@ router.get('/:userId/shared-profile', validation(validators.shareProfile) , asyn
 
 router.patch('/profile-picture' ,
     authentication()
-    ,upload("user/image").single("image") , async(req , res , next )=>{
-           console.log(req.file);
+    ,upload("user/image", [...fieldValidation.image], 10)
+    .single("attachment"),
+    validation(validators.profilePicture)
+    , async(req , res , next )=>{
     const account = await profilePicture(req.file ,  req.user )
+    return successResponse({res ,result:{account} })
+})
+
+router.patch('/cover-picture' ,
+    authentication()
+    ,upload("user/image", [...fieldValidation.image], 10)
+    .fields([
+        {name:"coverProfilePicture" , maxCount:2}
+    ]),
+    validation(validators.profileAttachment)
+    , async(req , res , next )=>{
+    const account = await coverPicture(req.files ,  req.user )
     return successResponse({res ,result:{account} })
 })
 
