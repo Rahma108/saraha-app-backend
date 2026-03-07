@@ -7,7 +7,7 @@ export const upload = ( customPath = "general")=>{
 
     const storage = multer.diskStorage({
         destination: function(req , file , cb){
-            let fullPath = resolve(`./upload/${customPath}`)
+            let fullPath = resolve(`../upload/${customPath}`)
             if(!existsSync(fullPath)){
                 mkdirSync(fullPath , {recursive:true})
             }
