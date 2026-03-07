@@ -1,0 +1,1 @@
+export {default as otpRouter} from './otp.controller.js'
