@@ -8,6 +8,7 @@ import { GlobalError } from './common/utils/response/error.response.js';
 import { connectDB , connectRedis, redisClient } from './DB/index.js';
 import cors from 'cors'
 import {resolve} from 'node:path'
+import { get, set, update } from './common/services/index.js';
 
 console.log({NODE_ENV});
 async function bootstrap(){
@@ -21,12 +22,12 @@ app.use('/upload', express.static(resolve('../upload') ))
 await connectDB()
 // #Redis
 await connectRedis()
+
 //application routing ......................
 app.get('/' , (req , res , next )=>{
     res.send('Hello')
     
 })
-
 app.use('/auth',authRouter)
 app.use('/user', userRouter)
 app.use('/otp' , otpRouter)
