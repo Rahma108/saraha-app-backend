@@ -4,6 +4,10 @@ import { redisClient } from "../../DB/index.js";
 export const revokeTokenKey = ({userId , jti })=>{
     return `${baseRevokeTokenKey(userId)}::${jti}`
 }
+
+export const otpKey = (email)=>{
+    return `OTP:USER::${email}`
+}
 export const baseRevokeTokenKey = (userId)=>{
     return `RevokeToken::${userId}`
 }

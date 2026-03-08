@@ -32,6 +32,10 @@ export const REFRESH_EXPIRES_IN= parseInt(process.env.REFRESH_EXPIRES_IN)
 // OTP
 export const GMAIL=process.env.GMAIL
 export const PASSWORD=process.env.PASSWORD
+export const APPLICATION_NAME=process.env.APPLICATION_NAME
 
+export const LINKEDIN_LINK=process.env.LINKEDIN_LINK
+export const GITHUB=process.env.GITHUB
+export const INSTAGRAM_LINK=process.env.INSTAGRAM_LINK
 
 export const ClientID=process.env.ClientID

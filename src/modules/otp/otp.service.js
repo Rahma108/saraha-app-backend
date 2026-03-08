@@ -1,5 +1,5 @@
 
-import { sendOTP } from '../../common/utils/mailer/mailer.js';
+// import { sendOTP } from '../../common/utils/mailer/mailer.js';
 import { compareHash, generateHash } from '../../common/utils/security/index.js';
 import { findOne, OTPModel, UserModel } from '../../DB/index.js';
 

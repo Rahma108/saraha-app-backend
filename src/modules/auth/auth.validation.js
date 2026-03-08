@@ -17,6 +17,14 @@ export const signupSchema = {
     gender:joi.number().required()
 }).required()
 }
+
+export const confirmEmailSchema = {
+
+    body:joi.object().keys({
+    email:generalValidationFields.email.required(),
+    otp:generalValidationFields.otp.required()
+}).required()
+}
 export const googleSignupSchema = {
     body: joi.object().keys({
         idToken: joi.string().required() 

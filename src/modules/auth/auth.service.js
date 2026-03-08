@@ -8,7 +8,8 @@ import { compareHash, generateHash  , encrypt , decrypt, createLoginCredentials}
 import { create, createOne, findOne } from "../../DB/database.repository.js"
 import { UserModel } from "../../DB/index.js"
 import {OAuth2Client}from 'google-auth-library'
-import { sendOtpFunction } from "../otp/otp.service.js"
+import { createNumberOtp, emailTemplate, sendEmail } from "../../common/utils/index.js"
+import { set , otpKey , get } from "../../common/services/redis.service.js"
 export const signup =async (inputs)=>{
   const {userName , email ,  password , gender , phone , role  } = inputs 
   const checkEmailExists = await findOne({
@@ -27,15 +28,43 @@ export const signup =async (inputs)=>{
     const [user] = await create({ model:UserModel 
     , data : [{userName , email , password: await generateHash(password) , gender , phone : encrypt(phone) 
         , Provider: ProviderEnum.System  , role:role }] })
-        // Send a verification code to email after registration
-        await sendOtpFunction({ email: user.email });
+        const code = await createNumberOtp()
+        await set({key:  otpKey(email) , value : await generateHash(`${code}`)  , ttl:120 })
+        await sendEmail({
+          to : email ,
+          subject: "confirmEmail",
+          html:emailTemplate({code , title : "confirm-Email" })
+
+        })
   return user
+}
+//Confirm Email with otp..
+export const confirmEmail = async(inputs)=>{
+  const {email , otp} = inputs
+    const account = await findOne({
+    model:UserModel ,
+    select :"email" ,
+    filter:{email , confirmEmail:{$exists:false} , provider:ProviderEnum.System } 
+  })
+  if(!account){
+    throw NotFoundException({message:"Fail to find Match account ❌"})
+  }
+  const hashOtp = await get(otpKey(email))
+  if(!hashOtp){
+    throw NotFoundException({message : "Expired OTP 😊"})
+  }
+  if(!await compareHash(otp , hashOtp )){
+    throw ConflictException({message :"Invalid OTP ❌"})
+  }
+  account.confirmEmail = new Date()
+  await account.save()
+  return ;
 }
 export const login = async(inputs , issuer )=>{
   const {email ,  password  } = inputs 
   const user = await findOne({
     model :UserModel ,
-    filter:{email , Provider : ProviderEnum.System }
+    filter:{email , Provider : ProviderEnum.System  , confirmEmail:{$exists:true}}
   })
   if(!user){
     throw  NotFoundException({message:"Invalid Login Credentials ❌"})
