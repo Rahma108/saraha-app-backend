@@ -222,6 +222,8 @@ OTP hashed before saving
 One-time use enforced
 postman Doc :-
 https://documenter.getpostman.com/view/46710820/2sBXcDHMyH
+hoppscotch.io Doc:
+https://api-docs.hoppscotch.io/view/00192b5a-8f26-4ba6-a64c-6b4a35391175/CURRENT
  
 
 Expiration time to prevent reuse 

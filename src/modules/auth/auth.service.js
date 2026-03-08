@@ -29,11 +29,11 @@ export const signup =async (inputs)=>{
     , data : [{userName , email , password: await generateHash(password) , gender , phone : encrypt(phone) 
         , Provider: ProviderEnum.System  , role:role }] })
         const code = await createNumberOtp()
-        await set({key:  otpKey(email) , value : await generateHash(`${code}`)  , ttl:120 })
+        await set({key:  otpKey(email) , value : await generateHash(code.toString())  , ttl:120 })
         await sendEmail({
           to : email ,
           subject: "confirmEmail",
-          html:emailTemplate({code , title : "confirm-Email" })
+          html:emailTemplate(code , "confirm-Email" )
 
         })
   return user
@@ -44,7 +44,7 @@ export const confirmEmail = async(inputs)=>{
     const account = await findOne({
     model:UserModel ,
     select :"email" ,
-    filter:{email , confirmEmail:{$exists:false} , provider:ProviderEnum.System } 
+    filter:{email , confirmEmail: { $eq: null } , Provider:ProviderEnum.System } 
   })
   if(!account){
     throw NotFoundException({message:"Fail to find Match account ❌"})
@@ -64,7 +64,7 @@ export const login = async(inputs , issuer )=>{
   const {email ,  password  } = inputs 
   const user = await findOne({
     model :UserModel ,
-    filter:{email , Provider : ProviderEnum.System  , confirmEmail:{$exists:true}}
+    filter:{email , Provider : ProviderEnum.System  , confirmEmail:{ $ne: null }}
   })
   if(!user){
     throw  NotFoundException({message:"Invalid Login Credentials ❌"})

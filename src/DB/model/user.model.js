@@ -44,7 +44,8 @@ const userSchema =  new mongoose.Schema({
             type:String
         },
         confirmEmail:{
-            type:Date
+            type:Date,
+            default:null
         },
         provider:{
             type:Number , 
