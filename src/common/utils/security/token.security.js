@@ -6,8 +6,9 @@ import { ACCESS_EXPIRES_IN, REFRESH_EXPIRES_IN, System_REFRESH_TOKEN_SECURITY_KE
 import { AudienceEnum, TokenTypeEnum } from '../../enums/security.enum.js'
 import { BadRequestException, UnauthorizedException } from '../response/error.response.js'
 import { findOne } from '../../../DB/database.repository.js'
-import { TokenModel, UserModel } from '../../../DB/index.js'
+import { UserModel } from '../../../DB/index.js'
 import {randomUUID} from 'node:crypto'
+import { get, revokeTokenKey } from '../../services/redis.service.js'
 
 // jwt.sign({payload , signature , options })
 export const generateToken = async ({payload = {} , secretKey = User_TOKEN_SECURITY_KEY , options = {}  })=>{
@@ -91,11 +92,9 @@ export const decodeToken = async ({token , tokenType = TokenTypeEnum.access  } =
         throw BadRequestException({message : "Fail to decode this token aud is required  "})
         
     }
-    if(await findOne({model:TokenModel ,filter : {jwtid : decoded.jti } })){
+    if(decoded.jti && await get(revokeTokenKey({userId:decoded.subject , jti : decoded.jti }))){
         throw UnauthorizedException({message :"Invalid Login Session ❌"})
     }
-
-
 
     const [decodeTokenType , audienceType ] = decoded.aud
     if(decodeTokenType !== tokenType ){

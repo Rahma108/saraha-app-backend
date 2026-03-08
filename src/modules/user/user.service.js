@@ -1,17 +1,18 @@
 import fs from 'fs'
 import { resolve } from 'node:path';
 import { createLoginCredentials} from "../../common/utils/security/token.security.js";
-import { createOne, deleteMany, findOne, updateOne, UserModel } from "../../DB/index.js";
-import { TokenModel } from '../../DB/model/index.js';
-import { REFRESH_EXPIRES_IN } from '../../../config/config.service.js';
+import {findOne, updateOne, UserModel } from "../../DB/index.js";
+import { ACCESS_EXPIRES_IN, REFRESH_EXPIRES_IN } from '../../../config/config.service.js';
 import { LogoutEnum } from '../../common/enums/security.enum.js';
-
+import {baseRevokeTokenKey, deleteKeys, keys, revokeTokenKey, set} from '../../common/services/index.js'
+import { ConflictException } from '../../common/utils/index.js';
 
 // Access .......................................
 export const profile= async  (user)=>{
     user.phone = decrypt(user.phone)
     return user
 }
+
 
 export const sharedProfile= async  (userId)=>{
     
@@ -53,31 +54,35 @@ export const coverPicture = async(files , user )=>{
     return user
 }
 // refresh ........................................
+export const createRevokeToken = async( { userId ,jti , ttl  })=>{
+    await set({
+                key: revokeTokenKey({userId, jti}),
+                value : jti ,
+                ttl 
+            })
+    return ;
+}
 
-
-export const rotateToken = async  (user, issuer)=>{
+export const rotateToken = async  (user , {iat , jti , subject } , issuer)=>{
+    if((iat+ ACCESS_EXPIRES_IN )* 1000 >= Date.now() + (30000)  ){
+        throw ConflictException({message: "Current access token still valid "})
+    }
+    await createRevokeToken({userId:subject , jti , ttl:iat  + REFRESH_EXPIRES_IN })
     return await createLoginCredentials(user , issuer )
 }
 
-export const logout = async({flag}, user , decoded  )=>{
+export const logout = async({flag}, user , {jti , iat , subject} )=>{
     let status = 200
     switch (flag) {
         case LogoutEnum.All:
             user.changeCredentialTime= new Date(Date.now()) 
             await user.save()
 
-            await deleteMany({model:TokenModel , filter: { userId: user._id }})
+            await deleteKeys(await keys(baseRevokeTokenKey(subject)))
             break;
     
         default:
-            await createOne({
-                model:TokenModel,
-                data:{
-                    userId : decoded.subject ,
-                    jwtid:decoded.jti ,
-                    expiresIn:new Date((decoded.iat + REFRESH_EXPIRES_IN)* 1000)
-                }
-            } )
+            await createRevokeToken({userId:subject , jti , ttl:iat  + REFRESH_EXPIRES_IN })
             status=201
             break;
         }

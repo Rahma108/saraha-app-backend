@@ -1,6 +1,6 @@
 import multer from 'multer'
 import {randomUUID} from 'node:crypto'
-import { existsSync, fstat, mkdir, mkdirSync } from 'node:fs'
+import { existsSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 export const fieldValidation = {

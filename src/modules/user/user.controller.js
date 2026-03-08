@@ -43,7 +43,7 @@ router.patch('/cover-picture' ,
 
 router.get('/rotate' , authentication(TokenTypeEnum.refresh) , async (req , res , next )=>{
     
-    const result = await rotateToken(req.user , `${req.protocol}://${req.host}`)
+    const result = await rotateToken(req.user , req.decoded ,`${req.protocol}://${req.host}`)
     return successResponse({res , result})
 })
 
