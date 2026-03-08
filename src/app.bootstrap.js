@@ -1,14 +1,14 @@
 
 import express from 'express'
 
-import { authRouter , userRouter , otpRouter } from './modules/index.js'
+import { authRouter , userRouter } from './modules/index.js'
 // file config ............................................
 import { NODE_ENV, port } from '../config/config.service.js'
 import { GlobalError } from './common/utils/response/error.response.js';
-import { connectDB , connectRedis, redisClient } from './DB/index.js';
+import { connectDB , connectRedis } from './DB/index.js';
 import cors from 'cors'
 import {resolve} from 'node:path'
-import { sendEmail } from './common/utils/index.js';
+
 
 console.log({NODE_ENV});
 async function bootstrap(){
@@ -29,7 +29,7 @@ app.get('/' , (req , res , next )=>{
 })
 app.use('/auth',authRouter)
 app.use('/user', userRouter)
-app.use('/otp' , otpRouter)
+
 
 // invalid routing ....................
 app.use('{/*dummy}' , (req , res , next)=>{
