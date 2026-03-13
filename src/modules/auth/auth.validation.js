@@ -25,6 +25,12 @@ export const confirmEmailSchema = {
     otp:generalValidationFields.otp.required()
 }).required()
 }
+
+export const resendConfirmEmailSchema = {
+    body:joi.object().keys({
+    email:generalValidationFields.email.required(),
+}).required()
+}
 export const googleSignupSchema = {
     body: joi.object().keys({
         idToken: joi.string().required() 

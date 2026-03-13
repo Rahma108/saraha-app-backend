@@ -1,6 +1,6 @@
 
 import {Router} from 'express'
-import { confirmEmail, login, loginWithGmail, signup, signupWithGmail } from './auth.service.js'
+import { confirmEmail, login, loginWithGmail, reSendConfirmEmail, signup, signupWithGmail } from './auth.service.js'
 import {  ErrorException, successResponse, validation } from '../../common/utils/index.js'
 import * as validators from './auth.validation.js'
 const router = Router() // app
@@ -12,6 +12,11 @@ router.post('/signup' ,  validation(validators.signupSchema) , async(req , res ,
 
 router.patch('/confirm-email' ,  validation(validators.confirmEmailSchema) , async(req , res , next )=>{
     const result = await confirmEmail(req.body)
+    return  successResponse({res})
+
+})
+router.patch('/resend-confirm-email' ,  validation(validators.resendConfirmEmailSchema) , async(req , res , next )=>{
+    const result = await reSendConfirmEmail(req.body)
     return  successResponse({res})
 
 })

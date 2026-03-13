@@ -8,6 +8,12 @@ export const revokeTokenKey = ({userId , jti })=>{
 export const otpKey = (email)=>{
     return `OTP:USER::${email}`
 }
+export const otpMaxRequestKey = (email)=>{
+    return `OTP:USER::${email}::Request`
+}
+export const otpBlockKey = (email)=>{
+    return `OTP:USER::${email}::Block::Request`
+}
 export const baseRevokeTokenKey = (userId)=>{
     return `RevokeToken::${userId}`
 }
@@ -94,5 +100,18 @@ export const  deleteKeys= async (keys )=>{
         return await redisClient.del(keys)
     } catch (error) {
         console.log(`Fail in redis  del Operations ${error}`);
+    }
+}
+
+export const increment = async(key)=>{
+    try {
+        if(!await redisClient.exists(key))return 0;
+
+        return redisClient.incr(key)
+
+    } catch (error) {
+        console.log(`FAIL IN REDIS INCREMENT OPERATIONS ${error}🫠`);
+        
+        
     }
 }
