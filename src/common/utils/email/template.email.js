@@ -1,6 +1,6 @@
 import { GITHUB, INSTAGRAM_LINK, LINKEDIN_LINK} from "../../../../config/config.service.js"
 
-export const emailTemplate = (code , title)=>{
+export const emailTemplate = ({code , title} = {} )=>{
     return `<!DOCTYPE html>
                 <html>
                 <head>

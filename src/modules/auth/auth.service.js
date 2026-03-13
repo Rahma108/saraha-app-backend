@@ -8,7 +8,7 @@ import { compareHash, generateHash  , encrypt , decrypt, createLoginCredentials}
 import { create, createOne, findOne } from "../../DB/database.repository.js"
 import { UserModel } from "../../DB/index.js"
 import {OAuth2Client}from 'google-auth-library'
-import { createNumberOtp, emailTemplate, sendEmail } from "../../common/utils/index.js"
+import { createNumberOtp, emailEmitter, emailTemplate, sendEmail } from "../../common/utils/index.js"
 import { set , otpKey , get, otpBlockKey, otpMaxRequestKey, ttl, increment, deleteKeys, keys } from "../../common/services/redis.service.js"
 
 export const generateAndSendConfirmEmailOtp = async(email)=>{
@@ -33,16 +33,11 @@ export const generateAndSendConfirmEmailOtp = async(email)=>{
       const code = await createNumberOtp()
         await set({
           key: otpKey(email) , 
-          value : await generateHash( `${code}` )
+          value : await generateHash(code.toString())
         , ttl: 120
       })
       checkOtpMaxRequest  > 0 ? await increment(maxTrialKey): await set({key : maxTrialKey , value : 1 , ttl : 300 })
-        await sendEmail({
-          to : email,
-          subject: "confirmEmail",
-          html:emailTemplate(code , "confirm-Email" )
-
-        })
+      emailEmitter.emit("Confirm_Email" , {to:email , subject:"Confirm_Email" ,code:code.toString() , title:"Confirm_Email"})
       return ;
 }
 
