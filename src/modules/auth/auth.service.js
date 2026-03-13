@@ -32,7 +32,7 @@ export const signup =async (inputs)=>{
         await set({key:  otpKey(email) , value : await generateHash(code.toString())  , ttl:120 })
         await sendEmail({
           to : email ,
-          subject: "confirmEmail",
+          subject: "confirm-Email",
           html:emailTemplate(code , "confirm-Email" )
 
         })

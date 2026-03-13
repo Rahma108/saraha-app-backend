@@ -30,9 +30,9 @@ export const sendEmail = async ({
         });
 
         console.log("Message sent:", info.messageId);
-        return info; // لو تحبي ترجع info
+        return info; 
     } catch (error) {
         console.error("Failed to send email:", error);
-        throw error; // لو تحبي الكولر يعرف ان في مشكلة
+        throw error; 
     }
 };

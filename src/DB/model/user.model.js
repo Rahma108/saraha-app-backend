@@ -57,9 +57,6 @@ const userSchema =  new mongoose.Schema({
             enum : Object.values(RoleEnum),
             default : RoleEnum.User
         },
-        changeCredentialTime: {
-            type:Date
-        },
         profilePicture : {
             type:String
         },

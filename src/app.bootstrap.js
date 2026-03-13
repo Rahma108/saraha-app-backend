@@ -17,7 +17,8 @@ const app = express()
 // convert buffer data .....................
 app.use(cors() , express.json())
 // load static files 
-app.use('/upload', express.static(resolve('../upload') ))
+app.use('/upload', express.static(resolve('../upload/')))
+
 // DB ....
 await connectDB()
 // #Redis
