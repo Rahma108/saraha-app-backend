@@ -3,7 +3,7 @@ import {EventEmitter} from 'node:events'
 
 export const emailEmitter = new EventEmitter()
 
-emailEmitter.on("Confirm_Email" , async(emailFunction)=>{
+emailEmitter.on("sendEmail" , async(emailFunction)=>{
     try {
         await emailFunction()
     

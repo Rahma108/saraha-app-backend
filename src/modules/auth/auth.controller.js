@@ -1,6 +1,6 @@
 
 import {Router} from 'express'
-import { confirmEmail, login, loginWithGmail, reSendConfirmEmail, signup, signupWithGmail } from './auth.service.js'
+import { confirmEmail, login, loginWithGmail, requestForgotPasswordCode, reSendConfirmEmail, signup, signupWithGmail } from './auth.service.js'
 import {  ErrorException, successResponse, validation } from '../../common/utils/index.js'
 import * as validators from './auth.validation.js'
 const router = Router() // app
@@ -20,6 +20,13 @@ router.patch('/resend-confirm-email' ,  validation(validators.resendConfirmEmail
     return  successResponse({res})
 
 })
+// Forget Password 
+router.post('/request-forgot-password-code' ,  validation(validators.verifyEmailSchema) , async(req , res , next )=>{
+    await requestForgotPasswordCode(req.body)
+    return  successResponse({res , status:201})
+
+})
+
 router.post('/login',validation(validators.loginSchema), async(req , res , next )=>{
 
     const result = await login(req.body , `${req.protocol}://${req.host}`)
