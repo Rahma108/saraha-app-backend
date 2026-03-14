@@ -9,6 +9,17 @@ export const shareProfile = {
 }
 
 
+export const updatePasswordSchema= {
+    body:joi.object().keys({
+        oldPassword:generalValidationFields.password.required(),
+        password:generalValidationFields.password.not(joi.ref("oldPassword")).required(),
+        confirmPassword:generalValidationFields.confirmPassword("password").required(),
+
+    }).required()
+}
+
+
+
 export const profilePicture ={
     file:generalValidationFields.file(fieldValidation.image).required()
 }
@@ -23,3 +34,4 @@ export const profileAttachment ={
         coverProfilePicture:joi.array().items(generalValidationFields.file(fieldValidation.image).required()).min(1).max(2).required(),
     }).required()
 }
+

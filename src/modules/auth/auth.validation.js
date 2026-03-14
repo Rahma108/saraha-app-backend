@@ -37,6 +37,18 @@ export const verifyEmailSchema = {
 }).required()
 }
 
+export const verifyForgotPasswordSchema = {
+    body:verifyEmailSchema.body.append({
+    otp:generalValidationFields.otp.required()
+}).required()
+}
+export const resetForgotPasswordSchema = {
+    body:verifyForgotPasswordSchema.body.append({
+    password:generalValidationFields.password.required(),
+    confirmPassword:generalValidationFields.confirmPassword('password').required(),
+
+}).required()
+}
 export const googleSignupSchema = {
     body: joi.object().keys({
         idToken: joi.string().required() 

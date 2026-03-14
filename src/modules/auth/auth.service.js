@@ -5,11 +5,11 @@ import { ClientID } from "../../../config/config.service.js"
 import { ProviderEnum} from "../../common/enums/user.enum.js"
 import { BadRequestException, ConflictException, NotFoundException } from "../../common/utils/response/index.js"
 import { compareHash, generateHash  , encrypt , decrypt, createLoginCredentials} from "../../common/utils/security/index.js"
-import { create, createOne, findOne } from "../../DB/database.repository.js"
+import { create, createOne, findOne, findOneAndUpdate } from "../../DB/database.repository.js"
 import { UserModel } from "../../DB/index.js"
 import {OAuth2Client}from 'google-auth-library'
 import { createNumberOtp, emailEmitter, emailTemplate, sendEmail } from "../../common/utils/index.js"
-import { set , otpKey , get, otpBlockKey, otpMaxRequestKey, ttl, increment, deleteKeys, keys } from "../../common/services/redis.service.js"
+import { set , otpKey , get, otpBlockKey, otpMaxRequestKey, ttl, increment, deleteKeys, keys, revokeTokenKey, baseRevokeTokenKey } from "../../common/services/redis.service.js"
 import { EmailEnum } from "../../common/enums/index.js"
 
 export const verifyEmailOtp = async({ email , subject=EmailEnum.ConfirmEmail , title = "Verify Account" }={} )=>{
@@ -132,6 +132,38 @@ export const requestForgotPasswordCode = async({email})=>{
   emailEmitter.emit("sendEmail" ,async ()=>{
           await verifyEmailOtp({email , subject:EmailEnum.ForgotPassword })
       })
+  return ;
+}
+
+export const verifyForgotPasswordCode = async({email , otp })=>{
+  const hashOtp = await get(otpKey({email , type:EmailEnum.ForgotPassword }))
+  if(!hashOtp){
+    throw NotFoundException({message : "Expired OTP ❌"})
+  }
+  if(!await compareHash(otp , hashOtp )){
+      throw ConflictException({message:"Invalid OTP 😊"})
+  }
+  return ;
+}
+
+export const resendForgotPasswordCode= async({email , otp , password })=>{
+    await verifyForgotPasswordCode({email ,otp })
+    const account = await findOneAndUpdate({
+      model:UserModel ,
+      filter :{email , confirmEmail:{ $ne: null } , Provider:ProviderEnum.System } ,
+      update:{
+        password:await generateHash(password),
+        changeCredentialTime:new Date() // All Logout
+      }
+
+    })
+    if(!account){
+      throw NotFoundException({message:"Fail to find Match account ❌"})
+    }
+    Promise.allSettled([
+          deleteKeys(await keys((otpKey({email , type:EmailEnum.ForgotPassword })))),
+          deleteKeys(await keys(baseRevokeTokenKey(account._id.toString())))
+    ])
   return ;
 }
 
