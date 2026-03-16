@@ -1,7 +1,7 @@
 
 import express from 'express'
 
-import { authRouter , userRouter } from './modules/index.js'
+import { authRouter , messageRouter, userRouter } from './modules/index.js'
 // file config ............................................
 import { NODE_ENV, port } from '../config/config.service.js'
 import { GlobalError } from './common/utils/response/error.response.js';
@@ -30,7 +30,7 @@ app.get('/' , (req , res , next )=>{
 })
 app.use('/auth',authRouter)
 app.use('/user', userRouter)
-
+app.use('/message', messageRouter)
 
 // invalid routing ....................
 app.use('{/*dummy}' , (req , res , next)=>{

@@ -39,7 +39,7 @@ router.patch('/resend-forgot-password-code' ,  validation(validators.resetForgot
 router.post('/login',validation(validators.loginSchema), async(req , res , next )=>{
 
     const result = await login(req.body , `${req.protocol}://${req.host}`)
-    return successResponse({res ,  result})
+    return successResponse({res ,  result:{...result}})
 })
 // Signup with Google
 router.post('/signup/gmail', validation(validators.googleSignupSchema), async (req, res, next) => {

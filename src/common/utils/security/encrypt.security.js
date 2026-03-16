@@ -29,9 +29,3 @@ export const decrypt = (data) => {
 
     return decrypted;
 };
-
-const message = "Hello World";
-const encrypted = encrypt(message);
-const decrypted = decrypt(encrypted);
-
-console.log({ encrypted, decrypted });

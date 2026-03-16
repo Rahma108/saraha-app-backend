@@ -5,9 +5,10 @@ import { resolve } from 'node:path'
 
 export const fieldValidation = {
     image: ['image/jpeg', 'image/png', 'image/jpg', 'image/pjpeg'],
-    video: ['video/mp4']
+    video: ['video/mp4'],
+    files: ['application/pdf', 'text/plain']
 }
-export const upload = ( customPath = "general" , validation = [] , size=5)=>{
+export const upload = ( {customPath = "general" , validation = [] , size=5}={})=>{
 
 
     const storage = multer.diskStorage({
