@@ -1,4 +1,8 @@
 ./config/.env.dev
 ./config/.env.prod
+/config/.env.dev
+/config/.env.prod
+config/.env.dev
+config/.env.prod
 upload
 node_modules/
