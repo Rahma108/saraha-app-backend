@@ -6,9 +6,8 @@ import { redisClient } from '../../../DB/redis.connection.db.js'
 export const Limiter = rateLimit({
     windowMs : 2 * 60 * 1000,
     limit:function(req){
-        const {country} = geoip.lookup(req.ip)
+        const country = geoip.lookup(req.ip)?.country || "Unknown"
         return country == "EG"?5000 : 3
-    
     },
     legacyHeaders:true, 
     standardHeaders: true,
