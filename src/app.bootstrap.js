@@ -3,19 +3,26 @@ import express from 'express'
 
 import { authRouter , messageRouter, userRouter } from './modules/index.js'
 // file config ............................................
-import { NODE_ENV, port } from '../config/config.service.js'
+import { NODE_ENV, ORIGINS, port } from '../config/config.service.js'
 import { GlobalError } from './common/utils/response/error.response.js';
 import { connectDB , connectRedis } from './DB/index.js';
 import cors from 'cors'
 import {resolve} from 'node:path'
-
+import helmet from 'helmet'
+import { Limiter } from './common/utils/middleware/limiter.js';
 
 console.log({NODE_ENV});
 async function bootstrap(){
 const app = express()
 
+const corsOptions = {
+    origin: ORIGINS,
+    optionsSuccessStatus: 200
+}
+
 // convert buffer data .....................
-app.use(cors() , express.json())
+app.set("trust proxy", true)
+app.use(cors(corsOptions) , Limiter, helmet() , express.json())
 // load static files 
 app.use('/upload', express.static(resolve('../upload/')))
 
@@ -24,7 +31,7 @@ await connectDB()
 // #Redis
 await connectRedis()
 //application routing ......................
-app.get('/' , (req , res , next )=>{
+app.get('/' , async (req , res , next )=>{
     res.send('Hello')
     
 })

@@ -36,7 +36,7 @@ router.patch('/resend-forgot-password-code' ,  validation(validators.resetForgot
     await resendForgotPasswordCode(req.body)
     return  successResponse({res , status:200})
 })
-router.post('/login',validation(validators.loginSchema), async(req , res , next )=>{
+router.post('/login'  , validation(validators.loginSchema), async(req , res , next )=>{
 
     const result = await login(req.body , `${req.protocol}://${req.host}`)
     return successResponse({res ,  result:{...result}})
