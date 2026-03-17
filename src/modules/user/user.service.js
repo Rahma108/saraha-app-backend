@@ -55,6 +55,7 @@ export const updatePassword= async  ({oldPassword , password} , user , issuer )=
 }
 
 export const profilePicture = async(file , user )=>{
+    //Upload Profile Picture API
     if(user.profilePicture){
         const oldPath = resolve(user.profilePicture);
         if(fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
@@ -66,6 +67,15 @@ export const profilePicture = async(file , user )=>{
 }
 
 export const coverPicture = async(files , user )=>{
+    // Cover Picture Upload Validation
+    const existingCount = user.coverProfilePicture ? user.coverProfilePicture.length : 0;
+    const newCount = files.coverProfilePicture ? files.coverProfilePicture.length : 0;
+
+    const totalImages = existingCount + newCount;
+
+    if (totalImages !== 2) {
+        throw new Error("Total cover images must be exactly 2");
+    }
     if(files.coverProfilePicture){
         user.coverProfilePicture = files.coverProfilePicture.map(file => file.finalPath)
     }
