@@ -2,5 +2,5 @@
 
 import bootstrap from "./app.bootstrap.js";
 
-const app = await bootstrap();
+const app =  bootstrap();
 export default app;
