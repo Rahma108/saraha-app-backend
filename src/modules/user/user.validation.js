@@ -25,7 +25,9 @@ export const profilePicture ={
 }
 
 export const coverPicture ={
-    files:joi.array().items(generalValidationFields.file(fieldValidation.image).required()).min(1).max(2).required()
+    files:joi.object().keys({
+        coverProfilePicture:joi.array().items(generalValidationFields.file(fieldValidation.image).required()).min(1).max(2).required()
+    })
 }
 
 export const profileAttachment ={

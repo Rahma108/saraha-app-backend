@@ -23,7 +23,7 @@ export const sharedProfile= async  (userId)=>{
 
     })
     if(profile.phone){
-      profile.phone = decrypt(profile.phone)
+       profile.phone = decrypt(profile.phone)
     }
     // Assignment تسجيل عدد الالزيارات على ال profile بتاعى ..
     // بخزن ف ال database فقط

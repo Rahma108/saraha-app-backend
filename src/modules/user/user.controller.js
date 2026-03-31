@@ -42,7 +42,7 @@ router.patch('/cover-picture' ,
     .fields([
         {name:"coverProfilePicture" , maxCount:2}
     ]),
-    validation(validators.profileAttachment)
+    validation(validators.coverPicture)
     , async(req , res , next )=>{
     const account = await coverPicture(req.files ,  req.user )
     return successResponse({res ,result:{account} })

@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {authentication, BadRequestException, decodeToken, fieldValidation, successResponse, upload, validation } from '../../common/utils/index.js'
-import { getAllMessages, getMessageById, sendMessage } from './message.service.js'
+import { deleteById, getAllMessages, getMessageById, sendMessage } from './message.service.js'
 import * as validators from './message.validation.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 const router= Router()
