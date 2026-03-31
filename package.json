@@ -4,7 +4,7 @@
   "main": "./src/main.js",
   "type": "module",
   "engines": {
-    "node": "v22.15.0"
+    "node": "22.x"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./src/main.js",
