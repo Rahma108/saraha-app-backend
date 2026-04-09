@@ -11,14 +11,15 @@ export const Limiter = rateLimit({
     },
     legacyHeaders:true, 
     standardHeaders: true,
-    skipFailedRequests:true,
+    skipFailedRequests:false,
+    skipSuccessfulRequests:true,
     handler:(req , res , next)=>{
         return res.status(429).json({message:"TOO MANY REQUEST"})
 
     },
     keyGenerator:function(req , res , next){// 41.45.210.10
         const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.ip
-        const ipV6 = ipKeyGenerator(ip, 56)
+        const ipV6 = ipKeyGenerator(ip, 56)  // Convert ip4 --> ip6
         console.log({ ipV6 })
         return `${ipV6}-${req.path}`
     },
@@ -33,7 +34,9 @@ export const Limiter = rateLimit({
         }
         },
         async decrement(key) {  // called by kipFailedRequests:true ,  skipSuccessfulRequests:true,
-        await redisClient.decr(key);
+            if(await redisClient.exists(key)){
+                    await redisClient.decr(key);
+            }
         },
     },
 }) 
