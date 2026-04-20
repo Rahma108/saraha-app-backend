@@ -31,7 +31,6 @@ router.get('/favourites',
         return successResponse({ res, result: { message } });
     }
 );
-
 router.get('/list' ,
     authentication(),
         async(req , res , next)=>{

@@ -152,4 +152,3 @@ export const freezeAccount = async (user) => {
     await user.save();
     return user;
 }
-

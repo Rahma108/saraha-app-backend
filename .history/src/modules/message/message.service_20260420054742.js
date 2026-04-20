@@ -96,10 +96,6 @@ export const toggleFavourite = async(messageId, user) => {
     return message;
 }
 
-
-
-
-
 export const getFavouriteMessages = async(user) => {
     const messages = await find({
         model: MessageModel,
@@ -110,6 +106,9 @@ export const getFavouriteMessages = async(user) => {
     });
     return messages;
 }
+
+
+
 
 
 

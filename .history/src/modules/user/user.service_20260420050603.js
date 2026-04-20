@@ -145,11 +145,3 @@ export const logout = async({flag}, user , {jti , iat , subject} )=>{
         }
     return status
 }
-
-
-export const freezeAccount = async (user) => {
-    user.isDeleted = new Date();
-    await user.save();
-    return user;
-}
-

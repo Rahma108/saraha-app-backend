@@ -67,10 +67,6 @@ const userSchema =  new mongoose.Schema({
         oldPasswords:[String],
         visitCount: { type: Number, default: 0 },
         changeCredentialTime:{type:Date } , // Logout
-        isDeleted: {
-            type: Date,
-            default: null
-}
 },{
     collection:"users" ,
     timestamps:true ,

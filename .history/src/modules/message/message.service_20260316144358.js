@@ -78,38 +78,8 @@ export const getAllMessages = async( user)=>{
     return messages
 }
 
-export const toggleFavourite = async(messageId, user) => {
-    const message = await findOne({
-        model: MessageModel,
-        filter: {
-            _id: messageId,
-            receiverId: user._id  // بس الـ receiver يقدر يعمل favourite
-        }
-    });
-
-    if (!message) {
-        throw NotFoundException({ message: "Invalid Message or No authorization" });
-    }
-
-    message.isFavourite = !message.isFavourite;
-    await message.save();
-    return message;
-}
 
 
-
-
-
-export const getFavouriteMessages = async(user) => {
-    const messages = await find({
-        model: MessageModel,
-        filter: {
-            receiverId: user._id,
-            isFavourite: true
-        }
-    });
-    return messages;
-}
 
 
 

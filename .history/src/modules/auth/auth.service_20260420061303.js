@@ -176,15 +176,13 @@ export const login = async(inputs , issuer )=>{
   if(!user){
     throw  NotFoundException({message:"Invalid Login Credentials ❌"})
   }
-  if (user.phone) {
-    user.phone = decrypt(user.phone);
-}
+  user.phone = decrypt(user.phone)
       // Bcrypt.
       const match = await compareHash(password , user.password )
   if(!match){
         throw NotFoundException({message : "Invalid Login Credentials .❌"})
   }
-  // Freeze Account
+  // 
       if (user.isDeleted) {
           user.isDeleted = null;
           await user.save();

@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { coverPicture, freezeAccount, logout, profile, profilePicture, removeProfilePicture, rotateToken, sharedProfile, updatePassword } from './user.service.js'
+import { coverPicture, logout, profile, profilePicture, removeProfilePicture, rotateToken, sharedProfile, updatePassword } from './user.service.js'
 import { authentication, successResponse, validation } from '../../common/utils/index.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 import { authorization } from '../../common/utils/middleware/authorization.middleware.js'
@@ -63,12 +63,4 @@ router.post('/logout', authentication() ,  async(req , res , next)=>{
     const status = await logout(req.body, req.user, req.decoded )
     return successResponse({res  , status:status  })
 })
-
-router.patch('/freeze',
-    authentication(),
-    async (req, res, next) => {
-        const account = await freezeAccount(req.user);
-        return successResponse({ res, result: { account } });
-    }
-);
 export default router

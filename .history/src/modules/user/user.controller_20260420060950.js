@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { coverPicture, freezeAccount, logout, profile, profilePicture, removeProfilePicture, rotateToken, sharedProfile, updatePassword } from './user.service.js'
+import { coverPicture, logout, profile, profilePicture, removeProfilePicture, rotateToken, sharedProfile, updatePassword } from './user.service.js'
 import { authentication, successResponse, validation } from '../../common/utils/index.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 import { authorization } from '../../common/utils/middleware/authorization.middleware.js'

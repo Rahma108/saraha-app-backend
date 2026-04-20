@@ -24,13 +24,6 @@ router.post('/:receiverId' ,
     return successResponse({res , status: 201 , result:{message} })
 
 })
-router.get('/favourites',
-    authentication(),
-    async(req, res, next) => {
-        const message = await getFavouriteMessages(req.user);
-        return successResponse({ res, result: { message } });
-    }
-);
 
 router.get('/list' ,
     authentication(),
@@ -60,6 +53,7 @@ router.delete('/:messageId' ,
 
 
 
+
 router.patch('/favourite/:messageId',
     authentication(),
     validation(validators.getMessageSchema),
@@ -68,7 +62,5 @@ router.patch('/favourite/:messageId',
         return successResponse({ res, result: { message } });
     }
 );
-
-
 
 export default router

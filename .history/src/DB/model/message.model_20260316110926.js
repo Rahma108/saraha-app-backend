@@ -22,11 +22,7 @@ const messageSchema = new mongoose.Schema({
     },
     attachments:{
         type:[String] 
-    },
-    isFavourite: {
-    type: Boolean,
-    default: false
-}
+    }
 
 },{
     timestamps:true , 

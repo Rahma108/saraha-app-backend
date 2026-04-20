@@ -66,11 +66,7 @@ const userSchema =  new mongoose.Schema({
         gallery:{type : [String] },
         oldPasswords:[String],
         visitCount: { type: Number, default: 0 },
-        changeCredentialTime:{type:Date } , // Logout
-        isDeleted: {
-            type: Date,
-            default: null
-}
+        changeCredentialTime:{type:Date }  // Logout
 },{
     collection:"users" ,
     timestamps:true ,

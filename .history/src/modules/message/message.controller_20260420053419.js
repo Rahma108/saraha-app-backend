@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {authentication, BadRequestException, decodeToken, fieldValidation, successResponse, upload, validation } from '../../common/utils/index.js'
-import { deleteById, getAllMessages, getFavouriteMessages, getMessageById, sendMessage, toggleFavourite } from './message.service.js'
+import { deleteById, getAllMessages, getMessageById, sendMessage } from './message.service.js'
 import * as validators from './message.validation.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 const router= Router()
@@ -24,13 +24,6 @@ router.post('/:receiverId' ,
     return successResponse({res , status: 201 , result:{message} })
 
 })
-router.get('/favourites',
-    authentication(),
-    async(req, res, next) => {
-        const message = await getFavouriteMessages(req.user);
-        return successResponse({ res, result: { message } });
-    }
-);
 
 router.get('/list' ,
     authentication(),
@@ -59,16 +52,21 @@ router.delete('/:messageId' ,
 })
 
 
-
-router.patch('/favourite/:messageId',
+router.get('/favourites',
     authentication(),
-    validation(validators.getMessageSchema),
     async(req, res, next) => {
-        const message = await toggleFavourite(req.params.messageId, req.user);
+        const message = await getFavouriteMessages(req.user);
         return successResponse({ res, result: { message } });
     }
 );
 
-
+router.patch('/favourite/:id',
+    authentication(),
+    validation(validators.getMessageSchema),
+    async(req, res, next) => {
+        const message = await toggleFavourite(req.params.id, req.user);
+        return successResponse({ res, result: { message } });
+    }
+);
 
 export default router

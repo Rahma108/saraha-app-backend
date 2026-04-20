@@ -24,13 +24,6 @@ router.post('/:receiverId' ,
     return successResponse({res , status: 201 , result:{message} })
 
 })
-router.get('/favourites',
-    authentication(),
-    async(req, res, next) => {
-        const message = await getFavouriteMessages(req.user);
-        return successResponse({ res, result: { message } });
-    }
-);
 
 router.get('/list' ,
     authentication(),
@@ -57,6 +50,7 @@ router.delete('/:messageId' ,
     return successResponse({res , result:{message} })
 
 })
+
 
 
 

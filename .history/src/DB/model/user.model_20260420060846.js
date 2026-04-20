@@ -68,8 +68,8 @@ const userSchema =  new mongoose.Schema({
         visitCount: { type: Number, default: 0 },
         changeCredentialTime:{type:Date } , // Logout
         isDeleted: {
-            type: Date,
-            default: null
+    type: Date,
+    default: null
 }
 },{
     collection:"users" ,

@@ -100,16 +100,6 @@ export const toggleFavourite = async(messageId, user) => {
 
 
 
-export const getFavouriteMessages = async(user) => {
-    const messages = await find({
-        model: MessageModel,
-        filter: {
-            receiverId: user._id,
-            isFavourite: true
-        }
-    });
-    return messages;
-}
 
 
 
