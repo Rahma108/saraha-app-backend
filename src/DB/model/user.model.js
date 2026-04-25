@@ -21,6 +21,7 @@ const userSchema =  new mongoose.Schema({
             maxLength: 25 , 
             trim : true 
         },
+        bio: {type : String , required: false , maxLength: 200 } ,
         email :{
             type:String , 
             required:true , 

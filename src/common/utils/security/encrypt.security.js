@@ -18,9 +18,22 @@ export const encrypt = (text) => {
 };
 
 export const decrypt = (data) => {
+    if (!data || !data.includes(':')) {
+        throw new Error("Invalid encrypted data format");
+    }
+
     const parts = data.split(':');
+
+    if (parts.length !== 2) {
+        throw new Error("Corrupted encrypted data");
+    }
+
     const iv = Buffer.from(parts[0], 'hex');
     const encryptedText = parts[1];
+
+    if (iv.length !== 16) {
+        throw new Error("Invalid IV length");
+    }
 
     const decipher = crypto.createDecipheriv(algorithm, key, iv);
 

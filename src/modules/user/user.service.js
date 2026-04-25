@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path, { resolve } from 'node:path';
 import { createLoginCredentials} from "../../common/utils/security/token.security.js";
-import {findOne, updateOne, UserModel } from "../../DB/index.js";
+import {findByIdAndUpdate, findOne, updateOne, UserModel } from "../../DB/index.js";
 import { ACCESS_EXPIRES_IN, REFRESH_EXPIRES_IN } from '../../../config/config.service.js';
 import { LogoutEnum } from '../../common/enums/security.enum.js';
 import {baseRevokeTokenKey, deleteKeys, keys, revokeTokenKey, set} from '../../common/services/index.js'
@@ -23,7 +23,7 @@ export const sharedProfile= async  (userId)=>{
 
     })
     if(profile.phone){
-       profile.phone = decrypt(profile.phone)
+        profile.phone = decrypt(profile.phone)
     }
     // Assignment تسجيل عدد الالزيارات على ال profile بتاعى ..
     // بخزن ف ال database فقط
@@ -54,6 +54,19 @@ export const updatePassword= async  ({oldPassword , password} , user , issuer )=
     return await createLoginCredentials(user , issuer)
 }
 
+
+export const editProfile = async ({ firstName, lastName , bio }, user) => {
+    const updatedUser = await findByIdAndUpdate({
+        model: UserModel,
+        id: user._id,          
+        update: { $set: {firstName, lastName , bio } },
+        options: { new: true, select: "-password" }, 
+    });
+
+    if (!updatedUser) throw new Error("User not found");
+
+    return updatedUser;
+};
 export const profilePicture = async(file , user )=>{
     //Upload Profile Picture API
     if (user.profilePicture) {

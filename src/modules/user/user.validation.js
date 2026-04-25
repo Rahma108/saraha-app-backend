@@ -18,7 +18,14 @@ export const updatePasswordSchema= {
     }).required()
 }
 
+export const editProfileSchema = {
+    body:joi.object().keys({
+        bio :generalValidationFields.bio.optional(),
+        firstName :generalValidationFields.firstName.optional(),
+        lastName:generalValidationFields.lastName.optional(),
 
+    }).required()
+}
 
 export const profilePicture ={
     file:generalValidationFields.file(fieldValidation.image).required()

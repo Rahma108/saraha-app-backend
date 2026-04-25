@@ -176,9 +176,13 @@ export const login = async(inputs , issuer )=>{
   if(!user){
     throw  NotFoundException({message:"Invalid Login Credentials ❌"})
   }
-  if (user.phone) {
-    user.phone = decrypt(user.phone);
-}
+    if (user.phone) {
+      try {
+        user.phone = decrypt(user.phone);
+      } catch (error) {
+        console.warn("Phone is not encrypted, skipping decrypt");
+      }
+    }
       // Bcrypt.
       const match = await compareHash(password , user.password )
   if(!match){

@@ -4,26 +4,79 @@ import { deleteById, getAllMessages, getFavouriteMessages, getMessageById, sendM
 import * as validators from './message.validation.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 const router= Router()
-router.post('/:receiverId' ,
-    async(req , res , next)=>{
-        if(req.headers?.authorization){
-            const {user , decoded}=  await decodeToken({token :req.headers.authorization.split(" ")[1], tokenType:TokenTypeEnum.access })
-            req.user = user
-            req.decoded= decoded
+// router.post('/:receiverId' ,
+//     async(req , res , next)=>{
+//         if(req.headers?.authorization){
+//             const {user , decoded}=  await decodeToken({token :req.headers.authorization.split(" ")[1], tokenType:TokenTypeEnum.access })
+//             req.user = user
+//             req.decoded= decoded
 
+//         }
+//             next()
+//     },
+//     upload({customPath:"message" , validation:[...fieldValidation.image , ...fieldValidation.files], maxSize : 1 }).array("attachments" , 2),
+//     validation(validators.sendMessageSchema),
+//         async(req , res , next)=>{
+//         if (!req.body?.content && !req.files) {
+//             throw BadRequestException({message :"Validation Error" , extra :[{message:"At least one key is required from [content , attachments]"}]})
+//         }
+//     const message = await sendMessage(req.params.receiverId , req.files , req.body)
+//     return successResponse({res , status: 201 , result:{message} })
+
+// })
+
+router.post(
+    "/:receiverId",
+    async (req, res, next) => {
+        try {
+        if (req.headers?.authorization) {
+            const { user, decoded } = await decodeToken({
+            token: req.headers.authorization.split(" ")[1],
+            tokenType: TokenTypeEnum.access,
+            });
+            req.user = user;
+            req.decoded = decoded;
+        } else {
+            req.user = null;// anonymous
         }
-            next()
+        next();
+        } catch (error) {
+        req.user = null; //  token غلط — anonymous
+        next();
+        }
     },
-    upload({customPath:"message" , validation:[...fieldValidation.image , ...fieldValidation.files], maxSize : 1 }).array("attachments" , 2),
+    upload({
+        customPath: "message",
+        validation: [...fieldValidation.image, ...fieldValidation.files],
+        maxSize: 1,
+    }).array("attachments", 2),
     validation(validators.sendMessageSchema),
-        async(req , res , next)=>{
+    async (req, res, next) => {
+        try {
         if (!req.body?.content && !req.files) {
-            throw BadRequestException({message :"Validation Error" , extra :[{message:"At least one key is required from [content , attachments]"}]})
+            throw BadRequestException({
+            message: "Validation Error",
+            extra: [
+                {
+                message: "At least one key is required from [content , attachments]",
+                },
+            ],
+            });
         }
-    const message = await sendMessage(req.params.receiverId , req.files , req.body)
-    return successResponse({res , status: 201 , result:{message} })
 
-})
+        const message = await sendMessage(
+            req.params.receiverId,
+            req.files,
+            req.body,
+            req.user || null 
+        );
+
+        return successResponse({ res, status: 201, result: { message } });
+        } catch (error) {
+        next(error);
+        }
+    }
+);
 router.get('/favourites',
     authentication(),
     async(req, res, next) => {

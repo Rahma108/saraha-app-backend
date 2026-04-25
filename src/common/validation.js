@@ -3,6 +3,9 @@ import { Types } from 'mongoose'
 
 export const generalValidationFields ={
     userName : joi.string().pattern(new RegExp(/^[A-Z]{1}[a-z]{1,24}\s[A-Z]{1}[a-z]{1,24}$/)),
+    firstName : joi.string(),
+    lastName : joi.string(),
+    bio : joi.string(),
     email : joi.string().email({minDomainSegments:2 , maxDomainSegments:3 , tlds:{allow:['com', 'edu' , 'net']}}),
     otp:joi.string().pattern(new RegExp(/^\d{6}$/)),
     password:joi.string().pattern(new RegExp(/^(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*\d){1,}(?=.*\W){1,}[\w\W\d].{8,25}$/)),

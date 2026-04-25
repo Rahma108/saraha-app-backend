@@ -3,7 +3,7 @@ import { createOne, deleteOne, find, findById, findOne, MessageModel, UserModel 
 import { NotFoundException } from "../../common/utils/index.js"
 
 
-export const sendMessage = async(receiverId , files=[] , {content} )=>{
+export const sendMessage = async(receiverId , files=[] , {content} , sender )=>{
     const receiver = await findOne({
         model:UserModel ,
         filter:{
@@ -20,6 +20,7 @@ export const sendMessage = async(receiverId , files=[] , {content} )=>{
             content ,
             attachments:files.map(file => file.finalPath),
             receiverId,
+            senderId: sender?._id || null, // ✅ لو anonymous يبقى null
 
         }
 

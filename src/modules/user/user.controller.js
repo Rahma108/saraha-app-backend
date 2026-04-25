@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { coverPicture, freezeAccount, logout, profile, profilePicture, removeProfilePicture, rotateToken, sharedProfile, updatePassword } from './user.service.js'
+import { coverPicture, editProfile, freezeAccount, logout, profile, profilePicture, removeProfilePicture, rotateToken, sharedProfile, updatePassword } from './user.service.js'
 import { authentication, successResponse, validation } from '../../common/utils/index.js'
 import { TokenTypeEnum } from '../../common/enums/security.enum.js'
 import { authorization } from '../../common/utils/middleware/authorization.middleware.js'
@@ -21,6 +21,14 @@ router.patch('/password' ,
     , async(req , res , next )=>{
     const credentials = await updatePassword(req.body , req.user ,`${req.protocol}://${req.host}` )
     return successResponse({res , result : {...credentials} } )
+})
+
+router.patch('/edit-profile' ,
+    authentication() ,
+    validation(validators.editProfileSchema)
+    , async(req , res , next )=>{
+    const result = await editProfile(req.body , req.user)
+    return successResponse({res , result } )
 })
 router.get('/:userId/shared-profile', validation(validators.shareProfile) , async (req , res , next )=>{
     
