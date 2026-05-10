@@ -27,7 +27,8 @@ const messageSchema = new mongoose.Schema({
     isFavourite: {
     type: Boolean,
     default: false
-}
+},
+isAnonymous: { type: Boolean, default: false }
 
 },{
     timestamps:true , 

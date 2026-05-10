@@ -16,10 +16,10 @@ console.log({NODE_ENV});
 async function bootstrap(){
 const app = express()
 
-
+// Limiter,
 // convert buffer data .....................
 app.set("trust proxy", true)
-app.use(cors() , Limiter, helmet() , express.json())
+app.use(cors() ,  helmet() , express.json())
 // load static files 
 app.use('/upload', express.static(resolve('./upload')));
 

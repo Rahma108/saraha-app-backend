@@ -3,30 +3,44 @@ import { createOne, deleteOne, find, findById, findOne, MessageModel, UserModel 
 import { NotFoundException } from "../../common/utils/index.js"
 
 
-export const sendMessage = async(receiverId , files=[] , {content} , sender )=>{
+export const sendMessage = async (
+    receiverId,
+    files = [],
+    { content },
+    sender
+) => {
+
     const receiver = await findOne({
-        model:UserModel ,
-        filter:{
-            _id:receiverId ,
-            confirmEmail:{ $ne: null }
+        model: UserModel,
+        filter: {
+            _id: receiverId,
+            confirmEmail: { $ne: null }
         },
-    })
-    if(!receiver){
-        throw NotFoundException({message:"No Matching Account ❌"})
+    });
+
+    if (!receiver) {
+        throw NotFoundException({ message: "No Matching Account ❌" });
     }
+
+    
+    const isAnonymous = !sender;
+
     const message = await createOne({
-        model:MessageModel,
-        data:{
-            content ,
-            attachments:files.map(file => file.finalPath),
+        model: MessageModel,
+        data: {
+            content,
+            attachments: files.map(file => file.finalPath),
             receiverId,
-            senderId: sender?._id || null, // ✅ لو anonymous يبقى null
-
+            senderId: sender?._id || null,
+            isAnonymous
         }
+    });
 
-    })
-    return message
-}
+    const fullMessage = await MessageModel.findById(message._id)
+        .populate("senderId", "-password -__v");
+
+    return fullMessage;
+};
 
 export const getMessageById = async(messageId , user)=>{
     const message = await findOne({
