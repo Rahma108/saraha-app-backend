@@ -289,8 +289,7 @@ export const signupWithGmail = async ({ idToken, issuer }) => {
       profilePicture: payload.picture,
       confirmEmail: new Date(),
       role: RoleEnum.USER,
-      password: '',
-      isDeleted: false
+      isDeleted: null
     }
   });
 
