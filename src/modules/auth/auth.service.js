@@ -2,7 +2,7 @@
 // logic--- queries ....
 
 import { ClientID } from "../../../config/config.service.js"
-import { ProviderEnum} from "../../common/enums/user.enum.js"
+import { ProviderEnum, RoleEnum} from "../../common/enums/user.enum.js"
 import { BadRequestException, ConflictException, NotFoundException } from "../../common/utils/response/index.js"
 import { compareHash, generateHash  , encrypt , decrypt, createLoginCredentials} from "../../common/utils/security/index.js"
 import { create, createOne, findOne, findOneAndUpdate } from "../../DB/database.repository.js"
