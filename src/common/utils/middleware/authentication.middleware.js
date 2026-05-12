@@ -5,47 +5,65 @@ import { decodeToken } from "../security/token.security.js"
 export const authentication = (tokenType = TokenTypeEnum.access) => {
     return async (req, res, next) => {
         try {
-        if (!req?.headers?.authorization) {
-            throw BadRequestException({ message: "Missing authorization key" });
+        
+        const authHeader = req?.headers?.authorization;
+
+        if (!authHeader) {
+            throw BadRequestException({ message: "Missing authorization header" });
         }
 
-        const { authorization } = req.headers;
-        const [flag, credentials] = authorization.split(" ");
+        const [flag, credentials] = authHeader.split(" ");
 
         if (!flag || !credentials) {
-            throw BadRequestException({ message: "Invalid authorization parts" });
+            throw BadRequestException({ message: "Invalid authorization format" });
         }
 
+        let user, decoded;
+
         switch (flag) {
-            case "Basic":
+
+            case "Basic": {
             const data = Buffer.from(credentials, "base64").toString();
             const [username, password] = data.split(":");
             console.log({ username, password });
             break;
+            }
 
-            case "Bearer":
-            const { user, decoded } = await decodeToken({
+            case "Bearer": {
+            const result = await decodeToken({
                 token: credentials,
                 tokenType,
             });
+            if (!result || !result.user) {
+                throw BadRequestException({ message: "Invalid token" });
+            }
+
+            user = result.user;
+            decoded = result.decoded;
+
+            if (!user._id) {
+                throw BadRequestException({ message: "Invalid user in token" });
+            }
 
             if (user.isDeleted) {
                 throw BadRequestException({
-                message: "Account is frozen, please login again to unfreeze",
+                message: "Account is frozen, please login again",
                 });
             }
 
-            req.user = user;
-            req.decoded = decoded;
             break;
+            }
 
             default:
-            throw BadRequestException({ message: "Invalid authorization flag" });
+            throw BadRequestException({ message: "Invalid authorization type" });
         }
+        req.user = user;
+        req.decoded = decoded;
 
-        next();
+        return next();
+
         } catch (error) {
-        next(error);
+        return next(error);
         }
     };
 };

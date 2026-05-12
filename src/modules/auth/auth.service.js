@@ -68,7 +68,7 @@ export const signup =async (inputs)=>{
   }
     const [user] = await create({ model:UserModel 
     , data : [{userName , email , password: await generateHash(password) , gender , phone : encrypt(phone) 
-        , Provider: ProviderEnum.System  , role:role }] })
+        , provider: ProviderEnum.System  , role:role }] })
     // Send a verification code to email after registration
       emailEmitter.emit("sendEmail" ,async ()=>{
           await verifyEmailOtp({email })
@@ -81,7 +81,7 @@ export const confirmEmail = async(inputs)=>{
     const account = await findOne({
     model:UserModel ,
     select :"email" ,
-    filter:{email , confirmEmail: { $eq: null } , Provider:ProviderEnum.System } 
+    filter:{email , confirmEmail: { $eq: null } , provider:ProviderEnum.System } 
   })
   if(!account){
     throw NotFoundException({message:"Fail to find Match account ❌"})
@@ -106,7 +106,7 @@ export const reSendConfirmEmail = async(inputs)=>{
     const account = await findOne({
     model:UserModel ,
     select :"email" ,
-    filter:{email , confirmEmail: { $eq: null } , Provider:ProviderEnum.System } 
+    filter:{email , confirmEmail: { $eq: null } , provider:ProviderEnum.System } 
   })
   if(!account){
     throw NotFoundException({message:"Fail to find Match account ❌"})
@@ -124,7 +124,7 @@ export const requestForgotPasswordCode = async({email})=>{
     const account = await findOne({
     model:UserModel ,
     select :"email" ,
-    filter:{email , confirmEmail:{ $ne: null } , Provider:ProviderEnum.System } 
+    filter:{email , confirmEmail:{ $ne: null } , provider:ProviderEnum.System } 
   })
   if(!account){
     throw NotFoundException({message:"Fail to find Match account ❌"})
@@ -150,7 +150,7 @@ export const resendForgotPasswordCode= async({email , otp , password })=>{
     await verifyForgotPasswordCode({email ,otp })
     const account = await findOneAndUpdate({
       model:UserModel ,
-      filter :{email , confirmEmail:{ $ne: null } , Provider:ProviderEnum.System } ,
+      filter :{email , confirmEmail:{ $ne: null } , provider:ProviderEnum.System } ,
       update:{
         password:await generateHash(password),
         changeCredentialTime:new Date() // All Logout
@@ -168,35 +168,43 @@ export const resendForgotPasswordCode= async({email , otp , password })=>{
 }
 
 export const login = async(inputs , issuer )=>{
-  const {email ,  password  } = inputs 
+  const {email , password} = inputs 
+
   const user = await findOne({
     model :UserModel ,
-    filter:{email , Provider : ProviderEnum.System  , confirmEmail:{ $ne: null }}
+    filter:{email , provider: ProviderEnum.System , confirmEmail:{ $ne: null }}
   })
-  if(!user){
-    throw  NotFoundException({message:"Invalid Login Credentials ❌"})
-  }
-    if (user.phone) {
-      try {
-        user.phone = decrypt(user.phone);
-      } catch (error) {
-        console.warn("Phone is not encrypted, skipping decrypt");
-      }
-    }
-      // Bcrypt.
-      const match = await compareHash(password , user.password )
-  if(!match){
-        throw NotFoundException({message : "Invalid Login Credentials .❌"})
-  }
-  // Freeze Account
-      if (user.isDeleted) {
-          user.isDeleted = null;
-          await user.save();
-      }
-      // Token 
-      return await createLoginCredentials(user , issuer)
-}    
 
+  if(!user){
+    throw NotFoundException({message:"Invalid Login Credentials ❌"})
+  }
+
+  if(user.provider !== ProviderEnum.System){
+    throw ConflictException({message: "Use Google Login ❗"})
+  }
+
+  // decrypt phone safely
+  if (user.phone) {
+    try {
+      user.phone = decrypt(user.phone);
+    } catch (error) {}
+  }
+
+  if(user.provider !== ProviderEnum.Google){
+    const match = await compareHash(password , user.password )
+
+    if(!match){
+      throw NotFoundException({message : "Invalid Login Credentials ❌"})
+    }
+}
+  // Freeze Account
+  if (user.isDeleted) {
+    user.isDeleted = false;
+    await user.save();
+  }
+
+  return await createLoginCredentials(user , issuer)
+}
 const verifyGoogleAccount = async(idToken)=>{
     const client = new OAuth2Client();
     const ticket = await client.verifyIdToken({
@@ -216,18 +224,26 @@ const verifyGoogleAccount = async(idToken)=>{
 
 export const loginWithGmail = async({idToken , issuer})=>{
   if (!idToken) {
-    throw new BadRequestException({ message: "idToken is required" });
-}
-  const payload = await verifyGoogleAccount(idToken)
-  const user = await findOne({model:UserModel , email:payload.email  , provider:ProviderEnum.Google })
-  if(!user){
-    throw NotFoundException({message : "Invalid Login Credentials ."})
+    throw BadRequestException({ message: "idToken is required" });
+  }
 
+  const payload = await verifyGoogleAccount(idToken)
+
+  const user = await findOne({
+    model: UserModel,
+    filter: { email: payload.email }
+  })
+
+  if(!user){
+    throw NotFoundException({message : "Account not found ❌"})
+  }
+
+  if(user.provider !== ProviderEnum.Google){
+    throw ConflictException({message:"Use normal login ❗"})
   }
 
   return await createLoginCredentials(user, issuer) 
 }
-
 
 export const signupWithGmail = async({idToken , issuer})=>{
   if (!idToken) {
@@ -257,17 +273,21 @@ const payload = await verifyGoogleAccount(idToken)
 
   //  3- User Not Exists ==> Create with Provider Google .
   // New user → create + login
-  const newUser = await createOne({
-    model: UserModel,
-    data: {
-      firstName: payload.given_name || '',
-      lastName: payload.family_name || '',
-      email: payload.email,
-      provider: ProviderEnum.Google,
-      profilePicture: payload.picture,
-      confirmEmail: new Date()
-    }
-  });
+const newUser = await createOne({
+  model: UserModel,
+  data: {
+    firstName: payload.given_name || '',
+    lastName: payload.family_name || '',
+    email: payload.email,
+    provider: ProviderEnum.Google,
+    profilePicture: payload.picture,
+    confirmEmail: new Date(),
+
+    role: RoleEnum.USER,
+    password: '',         
+    isDeleted: false
+  }
+});
 
   const token = await createLoginCredentials(newUser, issuer);
   return { account: token , status: 201 };

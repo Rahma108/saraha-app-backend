@@ -85,39 +85,59 @@ export const createLoginCredentials = async(user , issuer )=>{
         return {access_token , refresh_token }
 }
 
-export const decodeToken = async ({token , tokenType = TokenTypeEnum.access  } = {} )=>{
-    const decoded = jwt.decode(token)
-    console.log({decoded});
-    if(!decoded?.aud?.length){
-        throw BadRequestException({message : "Fail to decode this token aud is required  "})
-        
-    }
-    if(decoded.jti && await get(revokeTokenKey({userId:decoded.subject , jti : decoded.jti }))){
-        throw UnauthorizedException({message :"Invalid Login Session ❌"})
+export const decodeToken = async ({ token, tokenType = TokenTypeEnum.access } = {}) => {
+
+    if (!token) {
+        throw BadRequestException({ message: "Token is required" });
     }
 
-    const [decodeTokenType , audienceType ] = decoded.aud
-    if(decodeTokenType !== tokenType ){
-        throw BadRequestException({message : `Invalid Token Type ${decodeTokenType}  cannot access api while expected token of ${tokenType}`})
+    const decoded = jwt.decode(token);
+
+    if (!decoded) {
+        throw UnauthorizedException({ message: "Invalid token format" });
     }
-    const signatureLevel = await getTokenSignatureLevel(audienceType)
-    const {accessSignature , refreshSignature } = await getTokenSignature(signatureLevel)
-    console.log({accessSignature , refreshSignature });
 
-    const verifiedData = await verifyToken({token ,
-        secretKey : tokenType == TokenTypeEnum.refresh ? refreshSignature : accessSignature 
-    })
-    console.log("verifiedData:", verifiedData)
-    const user = await findOne({model : UserModel , filter : {_id : verifiedData.subject }})
-    if(!user){
-        throw UnauthorizedException({message : "Not Register Account ! " })
+    if (!decoded?.aud || !Array.isArray(decoded.aud)) {
+        throw BadRequestException({ message: "Invalid token payload (aud missing)" });
     }
-    if(user.changeCredentialTime && user.changeCredentialTime?.getTime() > decoded.iat * 1000 ){
-        throw UnauthorizedException({message :"Invalid Login Session ❌"})
+
+    const [decodeTokenType, audienceType] = decoded.aud;
+
+    if (decodeTokenType !== tokenType) {
+        throw BadRequestException({
+            message: `Invalid Token Type ${decodeTokenType}`
+        });
     }
-    return {user , decoded}
 
+    const signatureLevel = await getTokenSignatureLevel(audienceType);
+    const { accessSignature, refreshSignature } = await getTokenSignature(signatureLevel);
 
+    const verifiedData = await verifyToken({
+        token,
+        secretKey: tokenType === TokenTypeEnum.refresh
+            ? refreshSignature
+            : accessSignature
+    });
 
+    if (!verifiedData?.subject) {
+        throw UnauthorizedException({ message: "Invalid token subject" });
+    }
 
-}
+    const user = await findOne({
+        model: UserModel,
+        filter: { _id: verifiedData.subject }
+    });
+
+    if (!user) {
+        throw UnauthorizedException({ message: "User not found" });
+    }
+
+    if (
+        user.changeCredentialTime &&
+        user.changeCredentialTime.getTime() > decoded.iat * 1000
+    ) {
+        throw UnauthorizedException({ message: "Invalid Login Session ❌" });
+    }
+
+    return { user, decoded };
+};
