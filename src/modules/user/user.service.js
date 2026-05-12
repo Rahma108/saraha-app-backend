@@ -9,7 +9,11 @@ import { BadRequestException, compareHash, ConflictException, decrypt, generateH
 
 // Access .......................................
 export const profile= async  (user)=>{
-    user.phone = decrypt(user.phone)
+    if (user.phone) {
+    try {
+        user.phone = decrypt(user.phone);
+    } catch {}
+    }
     return user
 }
 
