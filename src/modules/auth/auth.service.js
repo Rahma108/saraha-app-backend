@@ -261,54 +261,39 @@ export const loginWithGmail = async ({ idToken, issuer }) => {
   return await createLoginCredentials(user, issuer);
 };
 
-export const signupWithGmail = async({idToken , issuer})=>{
+export const signupWithGmail = async ({ idToken, issuer }) => {
   if (!idToken) {
     throw new BadRequestException({ message: "idToken is required" });
-}
-const payload = await verifyGoogleAccount(idToken)
-
-//  1- User Exists in Database  And Provider == System  ==> Throw Error ..
-//  2- User Exists in Database  And Provider == Google  ==> Redirect google Login 
-//  3- User Not Exists ==> Create with Provider Google .
-
-  const checkUserExist = await findOne({model:UserModel , email:payload.email })
-  if(checkUserExist){
-    // 1- User Exists in Database  And Provider == System  ==> Throw Error ..
-    if(checkUserExist.provider == ProviderEnum.System){
-    throw ConflictException({message:"Account Already Exist With Different Provider ‼️"})
-
   }
-  // 2- User Exists in Database  And Provider == Google  ==> Redirect google Login 
-  // const result = await loginWithGmail({idToken} , issuer )
 
-  // return {result , status:200 }
-    const token = await createLoginCredentials(checkUserExist, issuer);
+  const payload = await verifyGoogleAccount(idToken);
+
+  let user = await findOne({
+    model: UserModel,
+    filter: { email: payload.email }
+  });
+
+  if (user) {
+    const token = await createLoginCredentials(user, issuer);
     return { account: token, status: 200 };
-
   }
 
-  //  3- User Not Exists ==> Create with Provider Google .
-  // New user → create + login
-const newUser = await createOne({
-  model: UserModel,
-  data: {
-    firstName: payload.given_name || '',
-    lastName: payload.family_name || '',
-    email: payload.email,
-    provider: ProviderEnum.Google,
-    profilePicture: payload.picture,
-    confirmEmail: new Date(),
-
-    role: RoleEnum.USER,
-    password: '',         
-    isDeleted: false
-  }
-});
+  
+  const newUser = await createOne({
+    model: UserModel,
+    data: {
+      firstName: payload.given_name || '',
+      lastName: payload.family_name || '',
+      email: payload.email,
+      provider: ProviderEnum.Google,
+      profilePicture: payload.picture,
+      confirmEmail: new Date(),
+      role: RoleEnum.USER,
+      password: '',
+      isDeleted: false
+    }
+  });
 
   const token = await createLoginCredentials(newUser, issuer);
-  return { account: token , status: 201 };
-
-  //token
-
-}
-
+  return { account: token, status: 201 };
+};
