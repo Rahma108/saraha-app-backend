@@ -222,28 +222,44 @@ const verifyGoogleAccount = async(idToken)=>{
 
 }
 
-export const loginWithGmail = async({idToken , issuer})=>{
+export const loginWithGmail = async ({ idToken, issuer }) => {
   if (!idToken) {
-    throw BadRequestException({ message: "idToken is required" });
+    throw new BadRequestException({ message: "idToken is required" });
   }
 
-  const payload = await verifyGoogleAccount(idToken)
+  const payload = await verifyGoogleAccount(idToken);
 
-  const user = await findOne({
+  let user = await findOne({
     model: UserModel,
     filter: { email: payload.email }
-  })
+  });
 
-  if(!user){
-    throw NotFoundException({message : "Account not found ❌"})
+  if (!user) {
+    user = await createOne({
+      model: UserModel,
+      data: {
+        firstName: payload.given_name || "",
+        lastName: payload.family_name || "",
+        email: payload.email,
+        provider: ProviderEnum.Google,
+        profilePicture: payload.picture,
+        confirmEmail: new Date(),
+
+        role: RoleEnum.USER,
+        password: "",
+        isDeleted: false
+      }
+    });
+  } else {
+    if (user.provider !== ProviderEnum.Google) {
+      throw ConflictException({
+        message: "Account already exists with email/password login"
+      });
+    }
   }
 
-  if(user.provider !== ProviderEnum.Google){
-    throw ConflictException({message:"Use normal login ❗"})
-  }
-
-  return await createLoginCredentials(user, issuer) 
-}
+  return await createLoginCredentials(user, issuer);
+};
 
 export const signupWithGmail = async({idToken , issuer})=>{
   if (!idToken) {
