@@ -199,7 +199,7 @@ export const login = async(inputs , issuer )=>{
 }
   // Freeze Account
   if (user.isDeleted) {
-    user.isDeleted = false;
+    user.isDeleted = null;
     await user.save();
   }
 
